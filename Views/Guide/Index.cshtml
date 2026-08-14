@@ -1,0 +1,465 @@
+@model rpgGame.Models.GuideViewModel
+
+@{
+    ViewData["Title"] = "遊戲攻略 - 文字 RPG 冒險指南";
+}
+
+<div class="row g-4">
+    <!-- 👈 1. 左側頁籤選單區 -->
+    <div class="col-md-3">
+        <div class="card-retro p-3 sticky-top" style="top: 90px;">
+            <div class="text-retro-gold font-monospace mb-3 pb-2 border-bottom border-secondary">
+                📖 攻略目錄
+            </div>
+            <!-- Bootstrap Tab 選單 -->
+            <div class="nav flex-column nav-pills gap-2" id="v-pills-tab" role="tablist">
+                <button class="nav-link active text-start text-white bg-dark border border-secondary" id="tab-initial" data-bs-toggle="pill" data-bs-target="#content-initial" type="button" role="tab">
+                    ⚙️ 初始設定
+                </button>
+                <button class="nav-link text-start text-white bg-dark border border-secondary" id="tab-monsters" data-bs-toggle="pill" data-bs-target="#content-monsters" type="button" role="tab">
+                    👾 怪物設定
+                </button>
+                <button class="nav-link text-start text-white bg-dark border border-secondary" id="tab-events" data-bs-toggle="pill" data-bs-target="#content-events" type="button" role="tab">
+                    🎲 隨機事件
+                </button>
+                <button class="nav-link text-start text-white bg-dark border border-secondary" id="tab-items" data-bs-toggle="pill" data-bs-target="#content-items" type="button" role="tab">
+                    🎒 道具介紹
+                </button>
+
+                <!-- 💡 提示：未來想新增第 5 個頁籤，只要複製下方這塊按鈕，並改 ID (例如 #content-new) 即可！ -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 👉 2. 右側詳細內容顯示區 -->
+    <div class="col-md-9">
+        <div class="tab-content" id="v-pills-tabContent">
+            
+            <!-- 區塊 1: 初始設定 -->
+            <div class="tab-pane fade show active" id="content-initial" role="tabpanel">
+                <div class="card-retro p-4 mb-4">
+                    <h3 class="text-retro-gold mb-3 fw-bold">│ 玩家初始設定指南</h3>
+                    <p class="text-secondary mb-4">踏入冒險前，玩家需選擇「職業」、「屬性」與「個性」，這些設定將決定你的基礎能力成長與屬性戰術！</p>
+
+                    <!-- ══════════════════ 1. 職業列表 ══════════════════ -->
+                    <div class="mb-5">
+                        <h4 class="text-retro-green fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span>⚔️</span> 選擇職業 (Job)
+                        </h4>
+
+                        @if (Model.Jobs == null || !Model.Jobs.Any())
+                        {
+                            <div class="alert alert-dark text-secondary border-secondary fs-7">
+                                目前尚無職業資料，請在 JobDatas 新增資料。
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-column gap-3">
+                                @foreach (var job in Model.Jobs)
+                                {
+                                    <div class="card-retro p-3 p-md-4 border-start border-4 border-success">
+                                        <div class="row g-3">
+                                            <!-- 左側：職業名稱與背景說明 -->
+                                            <div class="col-lg-6 border-end-lg border-secondary pe-lg-4">
+                                                <h5 class="text-white fw-bold mb-2">@job.JobName</h5>
+                                                <p class="text-secondary fs-6 lh-base mb-0">@job.Content</p>
+                                            </div>
+                                            <!-- 右側：7大能力初始數值網格 -->
+                                            <div class="col-lg-6 ps-lg-4">
+                                                <div class="bg-dark p-3 rounded border border-secondary font-monospace fs-6">
+                                                    <div class="row g-2 text-center">
+                                                        <div class="col-6">
+                                                            <span class="text-danger fw-bold">HP:</span> <strong class="text-white ms-1">@job.Hp</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-info fw-bold">MP:</span> <strong class="text-white ms-1">@job.Mp</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-warning fw-bold">物攻:</span> <strong class="text-white ms-1">@job.Attack</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-warning fw-bold">物防:</span> <strong class="text-white ms-1">@job.Defense</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-primary fw-bold">魔攻:</span> <strong class="text-white ms-1">@job.MagicAttack</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-primary fw-bold">魔防:</span> <strong class="text-white ms-1">@job.MagicDefense</strong>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <span class="text-retro-green fw-bold">速度:</span> <strong class="text-white ms-1">@job.Speed</strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <hr class="border-secondary my-5">
+
+                    <!-- ══════════════════ 2. 屬性相剋機制 (硬編碼頁面) ══════════════════ -->
+                    <div class="mb-5">
+                        <h4 class="text-retro-gold fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span>🔮</span> 七大屬性與相剋規則 (CurrentType)
+                        </h4>
+                        <p class="text-secondary fs-6 mb-4">戰鬥時根據雙方屬性會產生額外傷害加成或減傷效果：</p>
+
+                        <!-- 四元素循環圈說明面板 -->
+                        <div class="card-retro p-4 mb-4 border border-warning">
+                            <h6 class="text-warning fw-bold mb-3">🔄 四元素循環相剋：</h6>
+                            <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 fs-5 font-monospace text-center py-2">
+                                <span class="badge bg-primary px-3 py-2">💧 水 (Water)</span>
+                                <span class="text-warning fw-bold">＞</span>
+                                <span class="badge bg-danger px-3 py-2">🔥 火 (Fire)</span>
+                                <span class="text-warning fw-bold">＞</span>
+                                <span class="badge bg-success px-3 py-2">🌪️ 風 (Wind)</span>
+                                <span class="text-warning fw-bold">＞</span>
+                                <span class="badge bg-warning text-dark px-3 py-2">🧱 土 (Earth)</span>
+                                <span class="text-warning fw-bold">＞</span>
+                                <span class="badge bg-primary px-3 py-2">💧 水 (Water)</span>
+                            </div>
+                        </div>
+
+                        <!-- 光暗與一般屬性說明面板 -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded border border-secondary h-100">
+                                    <h6 class="text-white fw-bold mb-2">⚖️ 光與暗 (Light & Dark)</h6>
+                                    <p class="text-secondary fs-6 mb-0">
+                                        <span class="text-warning">✨ 光 (Light)</span> 與 <span class="text-purple" style="color: #a855f7;">🌑 黑暗 (Dark)</span> 為雙向互相克制關係，雙方互相攻擊時皆會造成額外加成傷害。
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded border border-secondary h-100">
+                                    <h6 class="text-white fw-bold mb-2">⚪ 一般屬性 (Normal)</h6>
+                                    <p class="text-secondary fs-6 mb-0">
+                                        一般屬性為中立屬性，對所有其他屬性皆不產生相剋加成或減傷，屬於穩定輸出型屬性。
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary my-5">
+
+                    <!-- ══════════════════ 3. 個性天賦 ══════════════════ -->
+                    <div>
+                        <h4 class="text-info fw-bold mb-3 d-flex align-items-center gap-2">
+                            <span>🎭</span> 個性與成長變化 (Nature)
+                        </h4>
+                        <p class="text-secondary fs-6 mb-3">個性能為角色提供獨特的能力成長方向修正：</p>
+
+                        @if (Model.Natures == null || !Model.Natures.Any())
+                        {
+                            <div class="alert alert-dark text-secondary border-secondary fs-7">
+                                目前尚無個性資料，請在 NatureDatas 新增資料。
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row g-3">
+                                @foreach (var nat in Model.Natures)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="p-3 bg-dark rounded border border-info h-100 d-flex flex-column justify-content-between">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h5 class="text-info fw-bold mb-0">@nat.NatureName</h5>
+                                            </div>
+                                            <div class="text-white fs-6">
+                                                💡 <strong class="text-secondary">能力成長：</strong> @nat.Ability
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 2: 怪物設定 -->
+            <div class="tab-pane fade" id="content-monsters" role="tabpanel">
+                <div class="card-retro p-4 mb-4">
+                    <h3 class="text-retro-gold mb-3 fw-bold">│ 怪物設定</h3>
+                    <p class="text-secondary mb-4">魔王派出測試村莊的五種具備獨特天賦的魔物，了解牠們的招式才能克敵制勝。(資料為等級1時的數據)</p>
+
+                    @if (Model.Monsters == null || !Model.Monsters.Any())
+                    {
+                        <div class="alert alert-dark text-secondary border-secondary">
+                            目前尚無怪物資料，請先在資料庫新增！
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-4">
+                            @foreach (var monster in Model.Monsters)
+                            {
+                                <!-- 單欄橫向卡片 (一排一隻) -->
+                                <div class="card-retro p-3 p-md-4 border-start border-4 border-danger">
+                                    <div class="row g-3">
+                                        <!-- 👈 左側：怪物名稱與七大能力值面板 -->
+                                        <div class="col-lg-5 border-end-lg border-secondary pe-lg-4">
+                                            <div class="d-flex align-items-center gap-2 mb-3">
+                                                <span class="fs-3">👾</span>
+                                                <h4 class="text-white fw-bold mb-0">@monster.MonsterName</h4>
+                                            </div>
+
+                                            <!-- 數值面板 (字體加大 fs-6，7大能力一致列表排列) -->
+                                            <div class="bg-dark p-3 rounded border border-secondary font-monospace fs-6">
+                                                <div class="row g-3 text-center">
+                                                    <div class="col-6">
+                                                        <span class="text-danger fw-bold">HP:</span> <strong class="text-white fs-5 ms-1">@monster.Hp</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-info fw-bold">MP:</span> <strong class="text-white fs-5 ms-1">@monster.Mp</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-warning fw-bold">物攻:</span> <strong class="text-white fs-5 ms-1">@monster.Attack</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-warning fw-bold">物防:</span> <strong class="text-white fs-5 ms-1">@monster.Defense</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-primary fw-bold">魔攻:</span> <strong class="text-white fs-5 ms-1">@monster.MagicAttack</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-primary fw-bold">魔防:</span> <strong class="text-white fs-5 ms-1">@monster.MagicDefense</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-retro-green fw-bold">速度:</span> <strong class="text-white fs-5 ms-1">@monster.Speed</strong>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <span class="text-secondary fw-bold">屬性:</span> <strong class="text-white fs-5 ms-1">@monster.Element</strong>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- 👉 右側：怪物解說與技能招式清單 (改為一排一個垂直顯示) -->
+                                        <div class="col-lg-7 ps-lg-4 d-flex flex-column justify-content-between">
+                                            <div>
+                                                <h6 class="text-retro-gold fw-bold mb-2">【 魔物簡介 】</h6>
+                                                <p class="text-secondary fs-6 lh-base mb-4">
+                                                    @monster.Content
+                                                </p>
+
+                                                <h6 class="text-retro-green fw-bold mb-2">【 技能招式 】</h6>
+                                                <!-- 招式列表：改用一排一個 (d-flex flex-column gap-2) -->
+                                                <div class="d-flex flex-column gap-2 mb-2">
+                                                    @if (!string.IsNullOrEmpty(monster.Skill1))
+                                                    {
+                                                        <div class="bg-dark border border-secondary text-secondary px-3 py-2 rounded font-monospace fs-6">
+                                                            @monster.Skill1
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(monster.Skill2))
+                                                    {
+                                                        <div class="bg-dark border border-warning text-warning px-3 py-2 rounded font-monospace fs-6">
+                                                            @monster.Skill2
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(monster.Skill3))
+                                                    {
+                                                        <div class="bg-dark border border-info text-info px-3 py-2 rounded font-monospace fs-6">
+                                                            @monster.Skill3
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(monster.Skill4))
+                                                    {
+                                                        <div class="bg-dark border border-danger text-danger px-3 py-2 rounded font-monospace fs-6">
+                                                            @monster.Skill4
+                                                        </div>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(monster.Skill5))
+                                                    {
+                                                        <div class="bg-dark border border-primary text-primary px-3 py-2 rounded font-monospace fs-6">
+                                                            @monster.Skill5
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 區塊 3: 隨機事件 -->
+            <div class="tab-pane fade" id="content-events" role="tabpanel">
+                <div class="card-retro p-4 mb-4">
+                    <h3 class="text-retro-gold mb-3 fw-bold">│ 鎮上閒晃隨機事件</h3>
+                    <p class="text-secondary mb-4">在平靜的村鎮中閒晃時，會根據權重隨機觸發以下遭遇：</p>
+                    <div class="d-flex flex-column gap-3">
+                        
+                        <!-- 1. 探聽到魔物情報 (15%) -->
+                        <div class="card-retro p-3 border-start border-4 border-info">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="text-white mb-0">📜 探聽到魔物情報</h5>
+                                <span class="badge bg-info text-dark font-monospace fs-6">機率：15%</span>
+                            </div>
+                            <p class="text-secondary fs-6 mb-0">從酒館或路過商人口中獲知魔物的情報。(若已探聽到情報，將產生撿道具事件。)</p>
+                        </div>
+
+                        <!-- 2. 撿到道具 (35%) -->
+                        <div class="card-retro p-3 border-start border-4 border-success">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="text-white mb-0">🎒 撿到道具</h5>
+                                <span class="badge bg-success font-monospace fs-6">機率：35%</span>
+                            </div>
+                            <p class="text-secondary fs-6 mb-0">在村莊附近或木箱堆旁撿到道具，隨機獲得各式功能藥水。</p>
+                        </div>
+
+                        <!-- 3. 與村民對話 (35% + 讀取 EventsData) -->
+                        <div class="card-retro p-3 border-start border-4 border-primary">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="text-white mb-0">💬 與村民對話</h5>
+                                <span class="badge bg-primary font-monospace fs-6">機率：35%</span>
+                            </div>
+                            <p class="text-secondary fs-6 mb-3">與村民的閒聊事件，可能獲得各式能力加成或聽取小故事。</p>
+
+                            <!-- 動態呈現 EventsData 表格列表 -->
+                            <div class="bg-dark p-3 rounded border border-secondary">
+                                <h6 class="text-retro-gold fs-6 mb-3 fw-bold">【 村民遭遇詳細紀錄 】</h6>
+                                
+                                @if (Model.Events == null || ! Model.Events.Any())
+                                {
+                                    <div class="text-muted fs-7">目前資料庫無對話事件，請在 EventsDatas 新增資料。</div>
+                                }
+                                else
+                                {
+                                    <div class="d-flex flex-column gap-2">
+                                        @foreach (EventsData evt in Model.Events)
+                                        {
+                                            <div class="bg-black p-3 rounded border border-secondary">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <strong class="text-retro-green fs-6">👤 @evt.Person</strong>
+                                                    @if (evt.Porm == 1)
+                                                    {
+                                                        <span class="badge bg-success">@evt.Affect +@evt.Value</span>
+                                                    }
+                                                    else if (evt.Porm == 2)
+                                                    {
+                                                        <span class="badge bg-danger">@evt.Affect -@evt.Value</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">無特別影響</span>
+                                                    }
+                                                </div>
+                                                <p class="text-white mb-1 fs-6">「@evt.Talk」</p>
+                                                <div class="text-secondary fs-7">💡 事件：@evt.EventInfo</div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- 4. 閒晃一圈無事發生 (5%) -->
+                        <div class="card-retro p-3 border-start border-4 border-secondary">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="text-white mb-0">🍃 閒晃一圈無事發生</h5>
+                                <span class="badge bg-secondary font-monospace fs-6">機率：5%</span>
+                            </div>
+                            <p class="text-secondary fs-6 mb-0">風吹過樹葉啪嗒響，鎮上一如往常地平靜，什麼事都沒發生。</p>
+                        </div>
+
+                        <!-- 5. 踩到村民阿薛的陷阱 (10% + 讀取 StatusData) -->
+                        <div class="card-retro p-3 border-start border-4 border-warning">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="text-white mb-0">⚠️ 踩到村民阿薛的陷阱</h5>
+                                <span class="badge bg-warning text-dark font-monospace fs-6">機率：10%</span>
+                            </div>
+                            <p class="text-secondary fs-6 mb-3">村裡的惡作劇大王阿薛又在到處佈置陷阱了！不幸踩中將獲得持續負面狀態。</p>
+
+                            <!-- 動態呈現 StatusData 狀態清單 -->
+                            <div class="bg-dark p-3 rounded border border-danger">
+                                <h6 class="text-danger fs-6 mb-3 fw-bold">【 陷阱狀態與影響 】</h6>
+
+                                @if (Model.Statuses == null || !Model.Statuses.Any())
+                                {
+                                    <div class="text-muted fs-7">目前資料庫無狀態資料，請在 StatusDatas 新增資料。</div>
+                                }
+                                else
+                                {
+                                    <div class="row g-3">
+                                        @foreach (var st in Model.Statuses)
+                                        {
+                                            <div class="col-md-6">
+                                                <div class="p-3 bg-black rounded border border-danger h-100">
+                                                    <div class="text-warning fw-bold fs-6 mb-1">⚡ @st.StatusName</div>
+                                                    <div class="text-secondary fs-6">@st.Content</div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 區塊 4: 道具介紹 -->
+            <div class="tab-pane fade" id="content-items" role="tabpanel">
+                <div class="card-retro p-4 mb-4">
+                    <h3 class="text-retro-gold mb-3 fw-bold">│ 全道具資料</h3>
+                    <p class="text-secondary">目前共有 @Model.Items.Count() 項道具：</p>
+                    <!-- 如果資料庫裡面完全沒資料 -->
+                    @if (!Model.Items.Any())
+                    {
+                        <div class="alert alert-dark text-secondary border-secondary">
+                            目前尚無道具資料，請先在資料庫新增！
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- 迴圈走訪 Controller 傳過來的道具清單 -->
+                        <div class="row g-3">
+                            @foreach (var item in Model.Items)
+                            {
+                                <div class="col-md-6">
+                                    <div class="bg-dark p-3 rounded border border-secondary h-100">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h5 class="text-retro-green mb-0">@item.ItemName</h5>
+                                            <!-- 根據 Porm 正負面顯示不同顏色的 Badge -->
+                                            @if (item.Porm == 1)
+                                            {
+                                                <span class="badge bg-success">@item.Able +@item.Value</span>
+                                            }
+                                            else if(item.Porm == 2)
+                                            {
+                                                <span class="badge bg-danger">@item.Able -@item.Value</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary">@item.Able</span>
+                                            }
+                                        </div>
+                                        <p class="text-secondary fs-7 mb-2">@item.Content</p>
+                                        <div class="text-end font-monospace text-muted fs-8">
+                                            建檔時間：@item.CreatedAt.ToString("yyyy-MM-dd")
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 💡 提示：未來想新增第 5 個頁籤的內容，只要複製上方一個 tab-pane 區塊並改 ID 即可！ -->
+
+        </div>
+    </div>
+</div>

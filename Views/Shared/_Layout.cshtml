@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - 文字 RPG 冒險指南</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <!-- 復古字體 (Google Fonts: Press Start 2P & Noto Sans TC) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 復古深色系主題基本設定 */
+        body {
+            background-color: #121212;
+            color: #d4d4d4;
+            font-family: 'Noto Sans TC', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 經典文字 RPG 的綠/金點綴色 */
+        .text-retro-green { color: #4af626 !important; }
+        .text-retro-gold { color: #f39c12 !important; }
+
+        /* 導覽列樣式 */
+        .navbar-retro {
+            background-color: #1a1a1a;
+            border-bottom: 2px solid #333;
+        }
+        .navbar-retro .navbar-brand {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.1rem;
+            color: #4af626;
+        }
+        .navbar-retro .nav-link {
+            color: #b0b0b0;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .navbar-retro .nav-link:hover, .navbar-retro .nav-link.active {
+            color: #f39c12;
+        }
+
+        /* 復古卡片外框 (邊框強化感) */
+        .card-retro {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+        }
+        .card-retro-header {
+            background-color: #252525;
+            border-bottom: 1px solid #333;
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        /* 按鈕風格 */
+        .btn-retro-success {
+            background-color: #2e7d32;
+            color: #fff;
+            border: 1px solid #4caf50;
+        }
+        .btn-retro-success:hover {
+            background-color: #388e3c;
+            color: #fff;
+        }
+        .btn-retro-outline {
+            border: 1px solid #f39c12;
+            color: #f39c12;
+        }
+        .btn-retro-outline:hover {
+            background-color: #f39c12;
+            color: #121212;
+        }
+
+        /* 頁尾 */
+        footer {
+            margin-top: auto;
+            background-color: #1a1a1a;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- 全站導覽列 -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-retro sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                <span class="me-2">>_</span> TEXT RPG
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto fs-6">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">首頁 (遊戲介紹)</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Guide" asp-action="Index">遊戲攻略</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Download" asp-action="Index">遊戲下載</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Forum" asp-action="Index">玩家討論區</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主內容渲染區 -->
+    <main class="container my-5">
+        @RenderBody()
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="py-4 text-center">
+        <div class="container">
+            <p class="mb-0 fs-7">© 2026 Text RPG Game Studio. Powered by ASP.NET Core MVC</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

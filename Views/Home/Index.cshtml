@@ -1,0 +1,56 @@
+﻿@{
+    ViewData["Title"] = "首頁 - 文字 RPG 冒險世界";
+}
+
+<!-- 主視覺 Banner (Terminal 終端機風) -->
+<div class="card-retro p-4 p-md-5 mb-5 border-start border-4 border-success">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <p class="text-retro-green font-monospace mb-2">$ ./start_game.sh</p>
+            <h1 class="display-5 fw-bold text-white mb-3">踏入純粹的文字冒險世界</h1>
+            <p class="lead text-secondary mb-4">
+                沒有華麗的 3D 渲染，只有最純粹的文字描述與策略對決。靠著你的抉擇、事件際遇與屬性剋制，來保護村莊幸免於難!。
+            </p>
+            <div class="d-flex gap-3">
+                <a asp-controller="Download" asp-action="Index" class="btn btn-retro-success btn-lg px-4 fs-6">
+                    <i class="bi bi-download"></i> 立即免費下載 (.exe)
+                </a>
+                <a asp-controller="Guide" asp-action="Index" class="btn btn-retro-outline btn-lg px-4 fs-6">
+                    新手冒險指南
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 核心特色 3 欄式卡片 -->
+<h3 class="text-retro-gold mb-4 fw-bold">│ 遊戲三大特色</h3>
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card-retro h-100 p-4">
+            <div class="text-retro-green fs-1 mb-3">⚔️</div>
+            <h5 class="text-white fw-bold mb-2">回合制戰鬥</h5>
+            <p class="text-secondary fs-7 mb-0">
+                結合屬性相剋機制，面對不同天賦與招式的怪物，選擇最佳的對決策略。
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-retro h-100 p-4">
+            <div class="text-retro-gold fs-1 mb-3">🎒</div>
+            <h5 class="text-white fw-bold mb-2">多樣化道具</h5>
+            <p class="text-secondary fs-7 mb-0">
+                多樣化道具與使用時機，打造屬於你的專屬強大 Build。
+            </p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-retro h-100 p-4">
+            <div class="text-retro-green fs-1 mb-3">🌲</div>
+            <h5 class="text-white fw-bold mb-2">動態遭遇與隨機事件</h5>
+            <p class="text-secondary fs-7 mb-0">
+                每一場冒險都是全新的體驗，隨機事件與際遇讓每一次探索都充滿驚喜。
+            </p>
+        </div>
+    </div>
+</div>

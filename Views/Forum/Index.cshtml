@@ -1,0 +1,190 @@
+@{
+    ViewData["Title"] = "玩家討論區 - 文字 RPG 冒險指南";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        
+        <!-- ✍️ 新增留言表單 -->
+        <div class="card-retro p-4 mb-5 border-start border-4 border-warning">
+            <h3 class="text-retro-gold mb-3 fw-bold">💬 玩家留言板</h3>
+            <p class="text-secondary fs-6 mb-4">請自訂 8 碼管理密碼（支援英數與特殊符號），未來修改與刪除留言時需比對！</p>
+
+            <form id="createForm">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label text-white fw-bold">玩家暱稱</label>
+                        <input type="text" id="username" class="form-control bg-dark text-white border-secondary" placeholder="例如：新手勇者" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label text-white fw-bold">管理密碼 (剛好 8 碼)</label>
+                        <input type="password" id="password" maxlength="8" minlength="8" class="form-control bg-dark text-white border-secondary" placeholder="8碼英數或符號" required />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-white fw-bold">留言內容</label>
+                    <textarea id="content" class="form-control bg-dark text-white border-secondary" rows="3" placeholder="想對大家說些什麼呢..." required></textarea>
+                </div>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-retro-success px-4 py-2 font-monospace">
+                        🚀 發送留言
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 📜 留言列表渲染區 -->
+        <h4 class="text-retro-green fw-bold mb-4">│ 全部留言</h4>
+        <div id="messageList" class="d-flex flex-column gap-3">
+            <div class="text-muted">載入留言中...</div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 💡 操作彈窗 (Modal)：修改/刪除驗證碼提示框 -->
+<div class="modal fade" id="actionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark text-white border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title text-retro-gold" id="modalTitle">驗證身分</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="actionTargetId" />
+                <input type="hidden" id="actionType" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">請輸入此留言的 8 碼管理密碼：</label>
+                    <input type="password" id="modalPassword" maxlength="8" class="form-control bg-black text-white border-secondary" required />
+                </div>
+                <div id="editContentGroup" class="mb-3 d-none">
+                    <label class="form-label fw-bold">修改後的留言內容：</label>
+                    <textarea id="modalContent" class="form-control bg-black text-white border-secondary" rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" id="btnConfirmAction" class="btn btn-retro-success">確認送出</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const API_URL = '/api/forum';
+    const actionModal = new bootstrap.Modal(document.getElementById('actionModal'));
+
+    // 頁面載入完成後自動撈取留言
+    document.addEventListener('DOMContentLoaded', loadMessages);
+
+    // 1. GET 撈取所有留言
+    async function loadMessages() {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        const container = document.getElementById('messageList');
+
+        if (data.length === 0) {
+            container.innerHTML = '<div class="card-retro p-4 text-center text-muted">目前尚無留言！</div>';
+            return;
+        }
+
+        container.innerHTML = data.map(msg => `
+            <div class="card-retro p-3 p-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
+                    <span class="text-retro-green fw-bold fs-6">👤 ${escapeHtml(msg.username)}</span>
+                    <div>
+                        <span class="text-muted font-monospace fs-7 me-3">${msg.createdAt}</span>
+                        <button class="btn btn-sm btn-outline-warning me-1" onclick="openModal(${msg.id}, 'edit', \`${escapeHtml(msg.content)}\`)">✏️ 修改</button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="openModal(${msg.id}, 'delete')">🗑️ 刪除</button>
+                    </div>
+                </div>
+                <p class="text-white fs-6 mb-0 mt-2" style="white-space: pre-line;">${escapeHtml(msg.content)}</p>
+            </div>
+        `).join('');
+    }
+
+    // 2. POST 新增留言
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            content: document.getElementById('content').value
+        };
+
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await res.json();
+        alert(result.message);
+        if (res.ok) {
+            document.getElementById('content').value = '';
+            document.getElementById('password').value = '';
+            loadMessages();
+        }
+    });
+
+    // 3. 開啟驗證 Modal
+    function openModal(id, type, oldContent = '') {
+        document.getElementById('actionTargetId').value = id;
+        document.getElementById('actionType').value = type;
+        document.getElementById('modalPassword').value = '';
+
+        if (type === 'edit') {
+            document.getElementById('modalTitle').innerText = '✏️ 修改留言';
+            document.getElementById('editContentGroup').classList.remove('d-none');
+            document.getElementById('modalContent').value = oldContent;
+        } else {
+            document.getElementById('modalTitle').innerText = '🗑️ 刪除留言';
+            document.getElementById('editContentGroup').classList.add('d-none');
+        }
+        actionModal.show();
+    }
+
+    // 4. PUT / DELETE 確認送出
+    document.getElementById('btnConfirmAction').addEventListener('click', async () => {
+        const id = document.getElementById('actionTargetId').value;
+        const type = document.getElementById('actionType').value;
+        const password = document.getElementById('modalPassword').value;
+
+        if (!password) {
+            alert('請輸入 8 碼密碼！');
+            return;
+        }
+
+        let res, payload = { password };
+
+        if (type === 'edit') {
+            payload.content = document.getElementById('modalContent').value;
+            res = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        } else {
+            res = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        }
+
+        const result = await res.json();
+        alert(result.message);
+        if (res.ok) {
+            actionModal.hide();
+            loadMessages();
+        }
+    });
+
+    // XSS 防護小小工具
+    function escapeHtml(str) {
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+</script>
+}
