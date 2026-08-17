@@ -45,7 +45,9 @@ namespace rpgGame.Controllers
                 return BadRequest(new { success = false, message = "輸入格式不正確，密碼需為 8 碼！" });
             }
 
-            message.CreatedAt = DateTime.Now;
+            var taiwanZone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Taipei");
+            message.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, taiwanZone);
+
             _context.ForumMessages.Add(message);
             _context.SaveChanges();
 

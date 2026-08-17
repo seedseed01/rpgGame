@@ -95,7 +95,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
                     <span class="text-retro-green fw-bold fs-6">👤 ${escapeHtml(msg.username)}</span>
                     <div>
-                        <span class="text-muted font-monospace fs-7 me-3">${msg.createdAt}</span>
+                        <span class="text font-monospace fs-7 me-3">${msg.createdAt}</span>
                         <button class="btn btn-sm btn-outline-warning me-1" onclick="openModal(${msg.id}, 'edit', \`${escapeHtml(msg.content)}\`)">✏️ 修改</button>
                         <button class="btn btn-sm btn-outline-danger" onclick="openModal(${msg.id}, 'delete')">🗑️ 刪除</button>
                     </div>
